@@ -38,6 +38,8 @@ public class RobotController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameController.Main.GameActive) { return; }
+
         Speed = _Speed;
 
         if (Input.GetKey(KeyCode.Joystick1Button5))
@@ -106,6 +108,10 @@ public class RobotController : MonoBehaviour
                 IntakeGrabJoint.xMotion = ConfigurableJointMotion.Locked;
                 IntakeGrabJoint.yMotion = ConfigurableJointMotion.Locked;
                 IntakeGrabJoint.zMotion = ConfigurableJointMotion.Locked;
+
+                IntakeGrabJoint.angularXMotion = ConfigurableJointMotion.Locked;
+                IntakeGrabJoint.angularYMotion = ConfigurableJointMotion.Locked;
+                IntakeGrabJoint.angularZMotion = ConfigurableJointMotion.Locked;
                 IntakeGrabbed = Closest;
                 GrabState = 0;
             }
@@ -115,6 +121,10 @@ public class RobotController : MonoBehaviour
             IntakeGrabJoint.xMotion = ConfigurableJointMotion.Free;
             IntakeGrabJoint.yMotion = ConfigurableJointMotion.Free;
             IntakeGrabJoint.zMotion = ConfigurableJointMotion.Free;
+
+            IntakeGrabJoint.angularXMotion = ConfigurableJointMotion.Free;
+            IntakeGrabJoint.angularYMotion = ConfigurableJointMotion.Free;
+            IntakeGrabJoint.angularZMotion = ConfigurableJointMotion.Free;
             IntakeGrabJoint.connectedBody = null;
             IntakeGrabbed = null;
             GrabState = 0;

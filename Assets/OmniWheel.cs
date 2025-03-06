@@ -17,7 +17,8 @@ public class OmniWheel : MonoBehaviour
 
     private void FixedUpdate()
     {
-        ;
+        if (!GameController.Main.GameActive) { return; }
+
         Vector3 InputAxis = new Vector3(0, -Input.GetAxisRaw("Vertical") + Input.GetAxisRaw("Rotational") * (TurnLeftIsForward ? 2 : -2) , -Input.GetAxisRaw("Horizontal"));
         WheelJoint.targetAngularVelocity = InputAxis.normalized * RobotController.Speed;      
     }

@@ -29,6 +29,7 @@ public class GameController : MonoBehaviour
     public Transform HighRung;//10
     public Transform Tape;
     public Transform OtherTeamTape;
+    public Transform Robot;
 
     public GameObject BlockPrefab;
 
@@ -166,6 +167,11 @@ public class GameController : MonoBehaviour
                     HookCount++;
                 }
             }
+        }
+
+        if (Vector3.Distance(new Vector3(4.25f, 0, -7.2f), Robot.position) <= 3)
+        {
+            Points += 3;
         }
 
         Points = Temp;

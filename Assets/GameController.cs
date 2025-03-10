@@ -50,6 +50,8 @@ public class GameController : MonoBehaviour
     {
         Main = this;
 
+        Robot.GetComponent<RobotController>().enabled = true;
+
         StartTime = Time.time;
 
         foreach (MeshRenderer M in Tape.GetComponentsInChildren<MeshRenderer>())

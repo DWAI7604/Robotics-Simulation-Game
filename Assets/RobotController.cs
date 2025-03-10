@@ -39,6 +39,9 @@ public class RobotController : MonoBehaviour
     {
         Speed = _Speed;
 
+        print(StarterBlock);
+        print(GameController.Main);
+
         StarterBlock.SetColor(GameController.Main.PlayerColor);
 
         ClawGrabbed = StarterBlock.transform;

@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 //minor foul is 5 points, major is 15
+//3 points for parking in the coversion zone or against the center area on the opposite side
 
 //3 seconds of holding the wrong teams color gives a minor foul, every 5 seconds past that gives another foul.
 
@@ -13,13 +16,15 @@ public class GameController : MonoBehaviour
 
     public int Points;
     public int Penalties;
+    public static int HighScore;
 
-    public float StartTime;//TeleOp lasts for 2 minutes (120 seconds)
+    public static float StartTime;//TeleOp lasts for 2 minutes (120 seconds)
     public float ConversionTime;
 
     public bool GameActive = true;
 
     public string PlayerColor;
+    public static string StaticPlayerColor;
 
     public Transform Blocks;
     public Transform LowBasket;//4
@@ -30,6 +35,8 @@ public class GameController : MonoBehaviour
     public Transform Tape;
     public Transform OtherTeamTape;
     public Transform Robot;
+
+    public TextMeshProUGUI EndText;
 
     public GameObject BlockPrefab;
 
@@ -54,6 +61,15 @@ public class GameController : MonoBehaviour
 
         StartTime = Time.time;
 
+        if (StaticPlayerColor == null)
+        {
+            StaticPlayerColor = PlayerColor;
+        }
+        else
+        {
+            PlayerColor = StaticPlayerColor;
+        }
+       
         foreach (MeshRenderer M in Tape.GetComponentsInChildren<MeshRenderer>())
         {
             if (M.transform.parent != Tape) { continue; }
@@ -85,7 +101,7 @@ public class GameController : MonoBehaviour
             for (int v = 1; v <= (i < 15 ? 3 : 1); v++)
             {
                 GameObject B = Instantiate(BlockPrefab, Blocks);
-                B.transform.position = new Vector3(Random.Range(-1f, 1f), Random.Range(0.5f, 1f), Random.Range(-1.8f, 1.8f));
+                B.transform.position = new Vector3(Random.Range(-0.9f, 0.9f), Random.Range(0.5f, 1f), Random.Range(-1.7f, 1.7f));
                 B.transform.rotation = Quaternion.Euler(Random.Range(-180, 180), Random.Range(-180, 180), Random.Range(-180, 180));
 
                 B.GetComponent<Block>().SetColor(v == 1 ? "Yellow" : v == 2 ? "Red" : "Blue");
@@ -102,12 +118,29 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKey(KeyCode.R))
+        {
+            StaticPlayerColor = "Red";
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else if (Input.GetKey(KeyCode.B))
+        {
+            StaticPlayerColor = "Blue";
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
         if (!GameActive) { return; }
 
         if (Time.time - StartTime >= 120)
         {
+            if (Points > HighScore)
+            {
+                HighScore = Points;
+            }
+
+            EndText.text = "Press R or B to reset the scene and change teams. \nYou scored " + Points + " points, the current high score is " + HighScore + ".";
+
             GameActive = false;
-            Debug.Log("TeleOp ended, you scored " + Points + " points.");
         }
 
         int Temp = 0;
@@ -134,6 +167,11 @@ public class GameController : MonoBehaviour
                 {
                     Temp += 8;
                 }
+            }
+
+            if (Vector3.Distance(new Vector3(-5, 0, -5), block.position) <= 1.25)
+            {
+                Temp += 1;
             }
 
             if (BlockInstance.Color == "Yellow")
@@ -169,15 +207,16 @@ public class GameController : MonoBehaviour
                     HookCount++;
                 }
             }
-            else if(Vector3.Distance(new Vector3(-5, 0, -5), block.position) <= 2.5)
-            {
-                Temp += 1;
-            }
+            
         }
 
         if (Vector3.Distance(new Vector3(4.25f, 0, -7.2f), Robot.position) <= 3)
         {
-            Points += 3;
+            Temp += 3;
+        }
+        else if (Robot.position.z > -1.2 && Robot.position.z < 2 && Robot.position.x > -1.4 && Robot.position.x < -1.1)
+        {
+            Temp += 3;
         }
 
         Points = Temp;

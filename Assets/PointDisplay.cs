@@ -16,6 +16,6 @@ public class PointDisplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Display.text = GameController.Main.Points.ToString();
+        Display.text = "Points: " + GameController.Main.Points.ToString();
     }
 }

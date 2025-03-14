@@ -16,6 +16,6 @@ public class TimeDisplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Display.text = (Mathf.Round(Mathf.Clamp(120 - Time.time - GameController.Main.StartTime, 0, 120) * 10) / 10).ToString();
+        Display.text = "Remaining time: " + (Mathf.Round(Mathf.Clamp(120 - (Time.time - GameController.StartTime), 0, 120) * 10) / 10).ToString();
     }
 }

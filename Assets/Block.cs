@@ -26,6 +26,6 @@ public class Block : MonoBehaviour
         Hook.SetActive(true);
 
         transform.rotation = Quaternion.Euler(0, -90, 90);
-        transform.position = new Vector3(4.5f - HookCount * 0.15f, 0.5f, -4.9f);
+        transform.position = new Vector3(4.5f - HookCount * 0.15f, 0.75f, -4.9f);
     }
 }

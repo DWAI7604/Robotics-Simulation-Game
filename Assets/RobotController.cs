@@ -12,16 +12,19 @@ public class RobotController : MonoBehaviour
     public float IntakeGrabDistance;
     public float ClawGrabDistance;
 
-    public Vector3 ArmHighAngle1;
-    public Vector3 ArmHighAngle2;
-    public Vector3 ArmWallAngle;
-    public Vector3 ArmPlaceAngle;
+    public Vector3 ArmHighAngleX;
+    public Vector3 ArmHighAngleZ;
+    public Vector3 ArmWallAngleX;
+    public Vector3 ArmWallAngleZ;
+    public Vector3 ArmPlaceAngleX;
+    public Vector3 ArmPlaceAngleZ;
 
     public ConfigurableJoint IntakeJoint;
+    public ConfigurableJoint IntakeRotationJoint;
     public ConfigurableJoint IntakeGrabJoint;
     public ConfigurableJoint VSlideJoint;
-    public ConfigurableJoint ArmJoint;
-    public ConfigurableJoint ArmJoint2;
+    public ConfigurableJoint ArmJointX;
+    public ConfigurableJoint ArmJointZ;
     public ConfigurableJoint ClawGrabJoint;
 
     public Transform Blocks;
@@ -64,7 +67,7 @@ public class RobotController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Joystick1Button5))
         {
-            IntakeJoint.targetPosition = new Vector3(0, 0, -IntakeExtendDistance);
+            IntakeJoint.targetPosition = new Vector3(0, IntakeExtendDistance, 0);
 
         }//extend intake
         else if (Input.GetKey(KeyCode.Joystick1Button4))
@@ -82,30 +85,30 @@ public class RobotController : MonoBehaviour
             VSlideJoint.targetPosition = new Vector3(0, 0, 0);
         }
 
-        if (Input.GetKey(KeyCode.Joystick1Button0) || Input.GetKey(KeyCode.Joystick1Button1) || Input.GetKey(KeyCode.Joystick1Button2))//rotate intake up
+        if (Input.GetKey(KeyCode.Joystick1Button1) || Input.GetKey(KeyCode.Joystick1Button2))//rotate intake up
         {
-            IntakeJoint.targetRotation = Quaternion.Euler(IntakeUpAngle, 0, 0);
+            IntakeRotationJoint.targetRotation = Quaternion.Euler(IntakeUpAngle, 0, 0);
         }
-        else if (Input.GetKey(KeyCode.Joystick1Button3))//reset intake rotation
+        else if (Input.GetKey(KeyCode.Joystick1Button3))//Rotate intake down;
         {
-            IntakeJoint.targetRotation = Quaternion.Euler(0, 0, 0);
+            IntakeRotationJoint.targetRotation = Quaternion.Euler(0, 0, 0);
         }
 
         if (Input.GetKey(KeyCode.Joystick1Button1))
         {
+            IntakeGrabState = -1;
+        }
+        else if (Input.GetKey(KeyCode.Joystick1Button2))
+        {
             IntakeGrabState = 0;
         }
-        else if (Input.GetKey(KeyCode.Joystick1Button2) || Input.GetKey(KeyCode.Joystick1Button3))
+        else if (Input.GetKey(KeyCode.Joystick1Button3))
         {
             IntakeGrabState = 1;
         }
-        else if (Input.GetKey(KeyCode.Joystick1Button0))
-        {
-            IntakeGrabState = -1;
-        }
 
 
-        if (IntakeGrabState == 1 && !IntakeGrabbed)
+        if (IntakeGrabState == 1 && !IntakeGrabbed && !ClawGrabbed)
         {
             Transform Closest = null;
             float ClosestDist = float.MaxValue;
@@ -154,26 +157,25 @@ public class RobotController : MonoBehaviour
 
         if (Input.GetAxis("VDPad") < -0.5f)
         {
-            ArmJoint.targetRotation = Quaternion.Euler(Vector3.zero);
-            ArmJoint2.targetRotation = Quaternion.Euler(Vector3.zero);
+            ArmJointX.targetRotation = Quaternion.Euler(Vector3.zero);
+            ArmJointZ.targetRotation = Quaternion.Euler(Vector3.zero);
         }
 
         else if(Input.GetAxis("HDPad") > 0.5f)
         {
-            ArmJoint.targetRotation = Quaternion.Euler(ArmPlaceAngle);
-            ArmJoint2.targetRotation = Quaternion.Euler(ArmPlaceAngle);
+            ArmJointX.targetRotation = Quaternion.Euler(ArmPlaceAngleX);
+            ArmJointZ.targetRotation = Quaternion.Euler(ArmPlaceAngleZ);
         }
         else if (Input.GetAxis("HDPad") < -0.5f)
         {
-            ArmJoint.targetRotation = Quaternion.Euler(ArmWallAngle);
-            ArmJoint2.targetRotation = Quaternion.Euler(Vector3.zero);
+            ArmJointX.targetRotation = Quaternion.Euler(ArmWallAngleX);
+            ArmJointZ.targetRotation = Quaternion.Euler(ArmWallAngleZ);
         }
 
         if (Input.GetKey(KeyCode.Joystick2Button0))
         {
-            print("High");
-            ArmJoint.targetRotation = Quaternion.Euler(ArmHighAngle1);
-            ArmJoint2.targetRotation = Quaternion.Euler(ArmHighAngle2);
+            ArmJointX.targetRotation = Quaternion.Euler(ArmHighAngleX);
+            ArmJointZ.targetRotation = Quaternion.Euler(ArmHighAngleZ);
 
             if (!ClawGrabbed)
             {
@@ -183,7 +185,7 @@ public class RobotController : MonoBehaviour
                 for (int i = 0; i < Blocks.childCount; i++)
                 {
                     Transform Child = Blocks.GetChild(i);
-                    float Dist = Vector3.Distance(IntakeJoint.transform.position, Child.position);
+                    float Dist = Vector3.Distance(ClawGrabJoint.transform.position, Child.position);
 
                     if (Dist < ClosestDist)
                     {
@@ -192,7 +194,7 @@ public class RobotController : MonoBehaviour
                     }
                 }
 
-                if (ClosestDist < IntakeGrabDistance)
+                if (ClosestDist < ClawGrabDistance)
                 {
                     ClawGrabbed = Closest;
                     ClawGrabbed.parent = transform;

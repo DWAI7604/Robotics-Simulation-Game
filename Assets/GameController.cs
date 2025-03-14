@@ -169,6 +169,10 @@ public class GameController : MonoBehaviour
                     HookCount++;
                 }
             }
+            else if(Vector3.Distance(new Vector3(-5, 0, -5), block.position) <= 2.5)
+            {
+                Temp += 1;
+            }
         }
 
         if (Vector3.Distance(new Vector3(4.25f, 0, -7.2f), Robot.position) <= 3)

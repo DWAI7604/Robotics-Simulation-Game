@@ -22,6 +22,7 @@ public class GameController : MonoBehaviour
     public float ConversionTime;
 
     public bool GameActive = true;
+    public static bool ControlEnabled;
 
     public string PlayerColor;
     public static string StaticPlayerColor;
@@ -38,7 +39,9 @@ public class GameController : MonoBehaviour
 
     public TextMeshProUGUI EndText;
 
+
     public GameObject BlockPrefab;
+    public GameObject ControlText;
 
     public Material Red;
     public Material Blue;
@@ -47,6 +50,7 @@ public class GameController : MonoBehaviour
     private Vector2 HighRungPos;
 
     private bool BlockInArea = false;
+    private bool ControlDebounce = false;
 
     private float LastConversion;
 
@@ -60,6 +64,8 @@ public class GameController : MonoBehaviour
         Robot.GetComponent<RobotController>().enabled = true;
 
         StartTime = Time.time;
+
+        ControlText.SetActive(ControlEnabled);
 
         if (StaticPlayerColor == null)
         {
@@ -134,7 +140,18 @@ public class GameController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
-        if (!GameActive) { return; }
+        if (Input.GetKey(KeyCode.C) && !ControlDebounce)
+        {
+            ControlDebounce = true;
+            ControlText.SetActive(!ControlText.activeInHierarchy);
+            ControlEnabled = ControlText.activeInHierarchy;
+        }
+        else if (!Input.GetKey(KeyCode.C) && ControlDebounce)
+        {
+            ControlDebounce = false;
+        }
+
+            if (!GameActive) { return; }
 
         if (Time.time - StartTime >= 120)
         {
@@ -143,7 +160,7 @@ public class GameController : MonoBehaviour
                 HighScore = Points;
             }
 
-            EndText.text = "Press R or B to reset the scene and change teams. \nYou scored " + Points + " points, the current high score is " + HighScore + ".";
+            EndText.text = "Press R or B to reset the scene and change teams, or press C to toggle the control scheme. \nYou scored " + Points + " points, the current high score is " + HighScore + ".";
 
             GameActive = false;
         }
